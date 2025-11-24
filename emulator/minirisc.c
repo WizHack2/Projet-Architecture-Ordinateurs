@@ -17,3 +17,5 @@ minirisc_t* minirisc_new(uint32_t initial_PC, platform_t *platform) {
 
     return minirisc;
 }
+
+// TODO On passe maintenant a minirisc.c en commencant par la fonction minirisc_fetch
