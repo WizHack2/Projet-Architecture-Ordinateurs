@@ -23,8 +23,8 @@ $(BUILD)/$(TARGET): $(OBJ)
 exec: $(BUILD)/$(TARGET)
 	./$<
 
-gdb: $(BUILD)/$(TARGET)
-    gdb --tui $<
+# gdb: $(BUILD)/$(TARGET) # TODO Ca marche pas avec. A voir pourquoi 
+#     gdb --tui $<
 
 clean:
 	@rm -rvf $(BUILD)

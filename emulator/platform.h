@@ -51,4 +51,9 @@ int platform_write(platform_t *plt, access_type_t access_type, uint32_t addr, ui
  * in the platform's memory.
  */
 void platform_load_program(platform_t *plt, const char *file_name);
+
+/**
+ * Lance un test pour voir le bon fonctionnement de platform.c
+ */
+void platform_test();
 #endif

@@ -1,6 +1,7 @@
 #ifndef MINIRISC_H
 #define MINIRISC_H
 #include <inttypes.h>
+#include "platform.h"
 
 /**
  * Processor object.

@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "platform.h"
 
 platform_t* platform_new() {
@@ -88,6 +90,10 @@ int platform_write(platform_t *plt, access_type_t access_type, uint32_t addr, ui
 
 void platform_load_program(platform_t *plt, const char *file_name) {
     FILE* program = fopen(file_name,"rb");
+    if (program == NULL) {
+        fprintf(stderr, "Erreur: Fichier programme non trouvé ou chemin incorrect: %s\n", file_name);
+        return;
+    }
 
     // Permet de connaitre la taille du fichier en se mettant a la fin puis en revenant au debut avant de lire.
     fseek(program, 0, SEEK_END);
@@ -99,4 +105,18 @@ void platform_load_program(platform_t *plt, const char *file_name) {
 }
 
 
-// TODO Implémenter des tests unitaires
+void platform_test() {
+    platform_t* platformTest = platform_new();
+    platform_load_program(platformTest,"/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/test1/build/esw.bin");
+    uint32_t* dataTest = (uint32_t*) malloc(sizeof(uint32_t));
+    platform_read(platformTest,ACCESS_WORD,0x80000000,dataTest);
+    printf("Valeur du premier Word: %x\n",*dataTest);
+    if (*dataTest == 0x00000502) printf("Fichier chargé et lu correctement.\n");
+    else printf("Erreur de chargement ou de lecture\n");
+
+    platform_write(platformTest,ACCESS_WORD,0x80000004,0x10101010);
+    platform_read(platformTest,ACCESS_WORD,0x80000004,dataTest);
+    printf("Valeur du mot lu à l'addresse 0x80000004: %x\n",*dataTest);
+    if (*dataTest == 0x10101010) printf("Lecture effectué correctement.\n");
+    platform_free(platformTest);
+} 

@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "minirisc.h"
 #include "platform.h"
 
