@@ -42,4 +42,9 @@ void minirisc_decode_and_execute(minirisc_t *mr);
  * in a loop while halt is false.
  */
 void minirisc_run(minirisc_t *mr);
+
+/**
+ * Lance des tests unitaires pour le minirisc.
+ */
+void minirisc_test();
 #endif
