@@ -41,24 +41,38 @@ void minirisc_fetch(minirisc_t *mr) {
 
 void minirisc_decode_and_execute(minirisc_t* mr) {
     uint32_t opcode = mr->IR & 0x7F;
+    uint32_t newValue;
+    uint32_t offset;
     int RD =  (mr->IR >> 7) & 0x1F; //Récupère le registre cible. On décale de 7 bits et on mets un masque pour avoir les 5 LSB de ce qu'il reste. 
+    int RS = (mr->IR >> 12) & 0x1F;
+    uint32_t MSB_extensionDeSigne = (mr->IR >> 31); // Pour pouvoir étendre le signe
+
 
     switch (opcode) {
         case 1: // LUI
-            uint32_t newValue = (mr->IR & 0xFFFFF000) ;
+            newValue = (mr->IR & 0xFFFFF000) ;
             minirisc_set_reg(mr,RD,newValue);
             break;
         case 2: //AUIPC
-            uint32_t newValue = mr->PC + (mr->IR & 0xFFFFF000);
+            newValue = mr->PC + (mr->IR & 0xFFFFF000);
             minirisc_set_reg(mr,RD,newValue);
             break;
         case 3: //JAL
-            uint32_t offset = (mr->IR & 0x001FFFFE); // LSB de l'offset a 0. Les MSBs a 0 avant d'étendre ou non pour le signe.
-            uint32_t MSB_extensionDeSigne = (mr->IR & 0x00100000); // Pour pouvoir étendre le signe
-            if (MSB_extensionDeSigne == 0x00100000) {
-                offset += 0xFFFE0000;
+            offset = (mr->IR & 0xFFFFF000) >> 11; // LSB de l'offset a 0. Les MSBs a 0 avant d'étendre ou non pour le signe.
+            MSB_extensionDeSigne = (mr->IR >> 31); // Pour pouvoir étendre le signe
+            if (MSB_extensionDeSigne == 0x1) {
+                offset |= 0xFFE00000;
             }
-            mr->PC += offset;
+            mr->next_PC = mr->PC + offset;
+            minirisc_set_reg(mr,RD,mr->PC + 4);
+            break;
+        case 4: //JALR //TODO Vérifier si la logique a bien été implémenté et ajouter un test
+            offset = (mr->IR) >> 20;
+            MSB_extensionDeSigne = (mr->IR >> 31); // Pour pouvoir étendre le signe
+            if (MSB_extensionDeSigne == 0x1) {
+                offset |= 0xFFFFF000;
+            }
+            mr->next_PC = (RS + offset) & 0xFFFFFFFE;
             minirisc_set_reg(mr,RD,mr->PC + 4);
             break;
         default:
@@ -106,7 +120,16 @@ void minirisc_test() {
     printf("Valeur dans le registre 1 en hexadecimal: %x\n",miniriscTest->regs[1]);
     printf("Cela correspond a une valeur immédiate de %u pour auipc.\n",(int) ((miniriscTest->regs[1] - 0x80000000) >> 12));
 
-    //TODO Faire tests unitaires pour JAL.
+    // Test de JAL
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/jal_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour JAL ===\n");
+    printf("Valeur dans le registre 1 en hexadecimal: %x\n",miniriscTest->regs[1]);
+    printf("Valeur dans le registre 2 en hexadecimal: %x\n",miniriscTest->regs[2]);
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+
 
     minirisc_free(miniriscTest);
     platform_free(platformTest);
