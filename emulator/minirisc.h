@@ -4,6 +4,14 @@
 #include "platform.h"
 
 /**
+ * Structure pour les CSR.
+ */
+typedef struct {
+	uint32_t mstatus; // Machine Status (Adresse 0x300)
+	uint32_t mepc;    // Machine Exception PC (Adresse 0x341)
+} csr_t;
+
+/**
  * Processor object.
  */
 typedef struct {
@@ -13,8 +21,8 @@ typedef struct {
 	uint32_t    regs[32]; // General purpose registers, r0 is hardwired to 0
 	platform_t* platform; // The platform this core is connected to
 	int         halt;     // Stop the emulator when other than 0
+	csr_t		csr;
 } minirisc_t;
-
 
 /**
  * Allocate and initializes a new `minirisc_t` object.
@@ -30,6 +38,16 @@ void minirisc_free(minirisc_t *mr);
  * Read the instruction pointed to by PC and place it in IR
  */
 void minirisc_fetch(minirisc_t *mr);
+
+/**
+ * Lit un CSR en fonction de son numéro (adresse)
+ */
+uint32_t csr_read(minirisc_t *mr, uint32_t csr_num);
+
+/**
+ * Écrit dans un CSR
+ */
+void csr_write(minirisc_t *mr, uint32_t csr_num, uint32_t value);
 
 /**
  * Decode the instruction in IR and execute it

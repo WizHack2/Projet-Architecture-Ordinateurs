@@ -16,6 +16,8 @@ minirisc_t* minirisc_new(uint32_t initial_PC, platform_t *platform) {
     }
     minirisc->platform = platform;
     minirisc->halt = 0; 
+    minirisc->csr.mstatus = 0;
+    minirisc->csr.mepc = 0;
 
     return minirisc;
 }
@@ -39,6 +41,22 @@ void minirisc_fetch(minirisc_t *mr) {
     }
 }
 
+uint32_t csr_read(minirisc_t *mr, uint32_t csr_num) { //TODO demander au prof si l´ implémentation est correcte
+    switch (csr_num) {
+        case 0x300: return mr->csr.mstatus;
+        case 0x341: return mr->csr.mepc;
+        default: return 0; // CSR inconnu ou non implémenté
+    }
+}
+
+void csr_write(minirisc_t *mr, uint32_t csr_num, uint32_t value) {
+    switch (csr_num) {
+        case 0x300: mr->csr.mstatus = value; break;
+        case 0x341: mr->csr.mepc = value; break;
+        default: break; // On ignore les écritures vers des CSR inconnus
+    }
+}
+
 void minirisc_decode_and_execute(minirisc_t* mr) {
     uint32_t opcode = mr->IR & 0x7F;
     uint32_t newValue;
@@ -49,6 +67,11 @@ void minirisc_decode_and_execute(minirisc_t* mr) {
     int RS2 =  (mr->IR >> 7) & 0x1F; // Rennomage des RD et RS. Pour la clarté du code. 
     int RS1 = (mr->IR >> 12) & 0x1F;
     int RS2_R = (mr->IR >> 17) & 0x1F; //Registre RS2 pour les operations de type R
+
+    uint32_t csrnum = (mr->IR) >> 20;
+    uint32_t old_val;
+    int imm5 = (mr->IR >> 12) & 0x1F;
+
 
 
     switch (opcode) {
@@ -334,10 +357,106 @@ void minirisc_decode_and_execute(minirisc_t* mr) {
             minirisc_set_reg(mr,RD,mr->regs[RS1] & mr->regs[RS2_R]);
             break;
         case 38: // ECALL
-            minirisc_set_reg(mr,10,-1); //TODO je suis pas sur de ce que veut le prof
+            minirisc_set_reg(mr,10,-1);
             break;
         case 39: // EBREAK
             mr->halt = 1;
+            break;
+        case 40: // RETI
+            mr->csr.mstatus |= 0x2; // On met a jour le bit INTERRUPT_ENABLE.
+            mr->next_PC = mr->csr.mepc;
+            break;
+        case 41: // WFI
+            // TODO Demander au prof ce qu'on fait concretement ici.
+            break;
+        case 42: // CSRRW
+            old_val = mr->regs[RS];
+            if (RD != 0) {
+                minirisc_set_reg(mr,RD,csr_read(mr,csrnum)); // TODO Vérifier si le comportement pour un csrnumber invalide est correct.
+            }
+            csr_write(mr,csrnum,old_val);
+            break;
+        case 43: // CSRRS
+            old_val = csr_read(mr,csrnum);
+            if (RD != 0) {
+                csr_write(mr,csrnum, csr_read(mr, csrnum) | mr->regs[RS]);
+            }
+            minirisc_set_reg(mr,RD,csr_read(mr, csrnum));
+            break;
+        case 44: // CSRRC
+            old_val = csr_read(mr,csrnum);
+            if (RD != 0) {
+                csr_write(mr,csrnum, csr_read(mr, csrnum) & ~mr->regs[RS]);
+            }
+            minirisc_set_reg(mr,RD,csr_read(mr, csrnum));
+            break;
+        case 45: // CSRRWI
+            if (RD != 0) {
+                minirisc_set_reg(mr, RD, csr_read(mr,csrnum));
+            }
+            csr_write(mr, csrnum, imm5);
+            break;
+        case 46: // CSRRSI
+            minirisc_set_reg(mr, RD, csr_read(mr,csrnum));
+            if (imm5 != 0) {
+                csr_write(mr, csrnum, csr_read(mr, csrnum) | imm5);
+            }
+            break;
+        case 47: // CSRRCI
+            minirisc_set_reg(mr, RD, csr_read(mr,csrnum));
+            if (imm5 != 0) {
+                csr_write(mr, csrnum, csr_read(mr, csrnum) & ~imm5);
+            }
+            break;
+        case 56: // MUL
+            minirisc_set_reg(mr,RD, mr->regs[RS1] * mr->regs[RS2_R]);
+            break;
+        case 57: // MULH
+            minirisc_set_reg(mr, RD, (uint32_t)(((int64_t)(int32_t)mr->regs[RS1] * (int64_t)(int32_t)mr->regs[RS2_R]) >> 32));
+            break;
+        case 58: // MULHSU
+            minirisc_set_reg(mr, RD, (uint32_t)(((int64_t)(int32_t)mr->regs[RS1] * (uint64_t)mr->regs[RS2_R]) >> 32));
+            break;
+        case 59: // MULHU
+            minirisc_set_reg(mr, RD, (uint32_t)(((uint64_t)mr->regs[RS1] * (uint64_t)mr->regs[RS2_R]) >> 32));
+            break;
+        case 60: // DIV
+            if ((int32_t)mr->regs[RS2_R] == 0) {
+                minirisc_set_reg(mr,RD,-1);
+            }
+            if (mr->regs[RS1] == 0x80000000 && (int32_t)mr->regs[RS2_R] == -1) {
+                minirisc_set_reg(mr,RD,mr->regs[RS1]);
+            }
+            else {
+                minirisc_set_reg(mr,RD,(int32_t)mr->regs[RS1] / (int32_t)mr->regs[RS2_R]);
+            }
+            break;
+        case 61: //DIVU
+            if (mr->regs[RS2_R] == 0) {
+                minirisc_set_reg(mr, RD, 0xFFFFFFFF);
+            }
+            else {
+                minirisc_set_reg(mr, RD, mr->regs[RS1] / mr->regs[RS2_R]);
+            }
+            break;
+        case 62: // REM
+            if ((int32_t)mr->regs[RS2_R] == 0) {
+                minirisc_set_reg(mr, RD, (int32_t)mr->regs[RS1]);
+            }
+            else if ((int32_t)mr->regs[RS1] == -2147483648 && (int32_t)mr->regs[RS2_R] == -1) {
+                minirisc_set_reg(mr, RD, 0);
+            }
+            else {
+                minirisc_set_reg(mr, RD, (int32_t)mr->regs[RS1] % (int32_t)mr->regs[RS2_R]);
+            }
+            break;
+        case 63: // REMU
+            if (mr->regs[RS2_R] == 0) {
+                minirisc_set_reg(mr, RD, mr->regs[RS1]);
+            }
+            else {
+                minirisc_set_reg(mr, RD, mr->regs[RS1] % mr->regs[RS2_R]);
+            }
             break;
         default:
             mr->halt = 1;
@@ -457,6 +576,8 @@ void minirisc_test() {
     minirisc_run(miniriscTest);
     printf("=== Test pour BGEU ===\n");
     printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+
+    // TODO Réaliser l'ensemble des tests unitaires
 
 
     minirisc_free(miniriscTest);
