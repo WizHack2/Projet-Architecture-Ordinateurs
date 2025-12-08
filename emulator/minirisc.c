@@ -324,8 +324,21 @@ void minirisc_decode_and_execute(minirisc_t* mr) {
                 minirisc_set_reg(mr,RD,0x0);
             }
             break;
-        case 35: //XOR TODO on continue les instructions. On fera les tests a la fin.
-            //TODO
+        case 35: // XOR
+            minirisc_set_reg(mr,RD,mr->regs[RS1] ^ mr->regs[RS2_R]);
+            break;
+        case 36: // OR
+            minirisc_set_reg(mr,RD,mr->regs[RS1] | mr->regs[RS2_R]);
+            break;
+        case 37: // AND
+            minirisc_set_reg(mr,RD,mr->regs[RS1] & mr->regs[RS2_R]);
+            break;
+        case 38: // ECALL
+            minirisc_set_reg(mr,10,-1); //TODO je suis pas sur de ce que veut le prof
+            break;
+        case 39: // EBREAK
+            mr->halt = 1;
+            break;
         default:
             mr->halt = 1;
             break;
