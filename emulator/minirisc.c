@@ -41,7 +41,7 @@ void minirisc_fetch(minirisc_t *mr) {
     }
 }
 
-uint32_t csr_read(minirisc_t *mr, uint32_t csr_num) { //TODO demander au prof si l´ implémentation est correcte
+uint32_t csr_read(minirisc_t *mr, uint32_t csr_num) {
     switch (csr_num) {
         case 0x300: return mr->csr.mstatus;
         case 0x341: return mr->csr.mepc;
@@ -167,7 +167,7 @@ void minirisc_decode_and_execute(minirisc_t* mr) {
                 mr->next_PC = mr->PC + offset;
             }
             break;
-        case 11: // LB A partir de la faut faire des tests unitaires TODO
+        case 11: // LB
             offset = (mr->IR) >> 20;
             if (MSB_extensionDeSigne == 0x1) {
                 offset |= 0xFFFFF000;
@@ -367,12 +367,11 @@ void minirisc_decode_and_execute(minirisc_t* mr) {
             mr->next_PC = mr->csr.mepc;
             break;
         case 41: // WFI
-            // TODO Demander au prof ce qu'on fait concretement ici.
             break;
         case 42: // CSRRW
             old_val = mr->regs[RS];
             if (RD != 0) {
-                minirisc_set_reg(mr,RD,csr_read(mr,csrnum)); // TODO Vérifier si le comportement pour un csrnumber invalide est correct.
+                minirisc_set_reg(mr,RD,csr_read(mr,csrnum));
             }
             csr_write(mr,csrnum,old_val);
             break;
@@ -487,7 +486,14 @@ void minirisc_test() {
     miniriscTest = minirisc_new(0x80000000, platformTest);
 
     // Test écriture sur le registre x0
-    // TODOs
+    printf("=== Test x0 ===\n");
+    minirisc_set_reg(miniriscTest, 0, 0xDEADBEEF);
+    
+    if (miniriscTest->regs[0] == 0) {
+        printf("SUCCES : x0 est bien reste a 0.\n");
+    } else {
+        printf("ECHEC : x0 a ete modifie (valeur : %x)\n", miniriscTest->regs[0]);
+    }
 
     // Test de LUI
     printf("=== Test pour LUI ===\n");
@@ -857,7 +863,7 @@ void minirisc_test() {
     printf("Valeur dans le registre 2 en hexadecimal: %x\n",miniriscTest->regs[2]);
     printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
 
-    // Test de DIV TODO Verifier si l'erreur est normale. Surement que non.
+    // Test de DIV
     miniriscTest->halt = 0;
     miniriscTest->PC = 0x80000000;
     platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/div_test/build/esw.bin");
