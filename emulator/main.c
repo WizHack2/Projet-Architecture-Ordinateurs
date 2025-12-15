@@ -13,7 +13,8 @@ int main() {
     platform = platform_new();
     minirisc = minirisc_new(0x80000000, platform);
 
-    platform_load_program(platform, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/test1/build/esw.bin");
+    // platform_load_program(platform, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/test1/build/esw.bin");
+    platform_load_program(platform, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/fibonacci/build/esw.bin");
     minirisc_run(minirisc);
 
     minirisc_free(minirisc);

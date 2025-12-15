@@ -424,7 +424,7 @@ void minirisc_decode_and_execute(minirisc_t* mr) {
             if ((int32_t)mr->regs[RS2_R] == 0) {
                 minirisc_set_reg(mr,RD,-1);
             }
-            if (mr->regs[RS1] == 0x80000000 && (int32_t)mr->regs[RS2_R] == -1) {
+            else if (mr->regs[RS1] == 0x80000000 && (int32_t)mr->regs[RS2_R] == -1) {
                 minirisc_set_reg(mr,RD,mr->regs[RS1]);
             }
             else {
@@ -577,8 +577,324 @@ void minirisc_test() {
     printf("=== Test pour BGEU ===\n");
     printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
 
-    // TODO Réaliser l'ensemble des tests unitaires
+    // Test de LB
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/lb_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour LB ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
 
+    // Test de LH
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/lh_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour LH ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+
+    // Test de LW
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/lw_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour LW ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+
+    // Test de LBU
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/lbu_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour LBU ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+
+    // Test de LHU
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/lhu_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour LHU ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+
+    // Test de SB
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/sb_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour SB ===\n");
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+
+    // Test de SH
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/sh_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour SH ===\n");
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+
+    // Test de SW
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/sw_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour SW ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+
+    // Test de ADDI
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/addi_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour ADDI ===\n");
+    printf("Valeur dans le registre 1 en hexadecimal: %x\n",miniriscTest->regs[1]);
+    printf("Valeur dans le registre 2 en hexadecimal: %x\n",miniriscTest->regs[2]);
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+
+    // Test de SLTI
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/slti_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour SLTI ===\n");
+    printf("Valeur dans le registre 2 en hexadecimal: %x\n",miniriscTest->regs[2]);
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+    printf("Valeur dans le registre 5 en hexadecimal: %x\n",miniriscTest->regs[5]);
+
+    // Test de SLTIU
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/sltiu_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour SLTIU ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+    printf("Valeur dans le registre 5 en hexadecimal: %x\n",miniriscTest->regs[5]);
+
+    // Test de XORI
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/xori_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour XORI ===\n");
+    printf("Valeur dans le registre 2 en hexadecimal: %x\n",miniriscTest->regs[2]);
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+
+    // Test de ORI
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/ori_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour ORI ===\n");
+    printf("Valeur dans le registre 2 en hexadecimal: %x\n",miniriscTest->regs[2]);
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+
+    // Test de ANDI
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/andi_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour ANDI ===\n");
+    printf("Valeur dans le registre 2 en hexadecimal: %x\n",miniriscTest->regs[2]);
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+
+    // Test de SLLI
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/slli_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour SLLI ===\n");
+    printf("Valeur dans le registre 2 en hexadecimal: %x\n",miniriscTest->regs[2]);
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+
+    // Test de SRLI
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/srli_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour SRLI ===\n");
+    printf("Valeur dans le registre 2 en hexadecimal: %x\n",miniriscTest->regs[2]);
+
+    // Test de SRAI
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/srai_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour SRAI ===\n");
+    printf("Valeur dans le registre 2 en hexadecimal: %x\n",miniriscTest->regs[2]);
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+
+    // Test de ADD
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/add_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour ADD ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+
+    // Test de SUB
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/sub_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour SUB ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+
+    // Test de SLL
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/sll_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour SLL ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+    printf("Valeur dans le registre 5 en hexadecimal: %x\n",miniriscTest->regs[5]);
+
+    // Test de SRL
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/srl_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour SRL ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+    printf("Valeur dans le registre 5 en hexadecimal: %x\n",miniriscTest->regs[5]);
+
+    // Test de SRA
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/sra_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour SRA ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+    printf("Valeur dans le registre 5 en hexadecimal: %x\n",miniriscTest->regs[5]);
+
+    // Test de SLT
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/slt_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour SLT ===\n");
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+    printf("Valeur dans le registre 5 en hexadecimal: %x\n",miniriscTest->regs[5]);
+    printf("Valeur dans le registre 6 en hexadecimal: %x\n",miniriscTest->regs[6]);
+
+    // Test de SLTU
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/sltu_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour SLTU ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+
+    // Test de XOR
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/xor_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour XOR ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+    printf("Valeur dans le registre 7 en hexadecimal: %x\n",miniriscTest->regs[7]);
+
+    // Test de OR
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/or_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour OR ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+
+    // Test de AND
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/and_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour AND ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+    printf("Valeur dans le registre 6 en hexadecimal: %x\n",miniriscTest->regs[6]);
+    printf("Valeur dans le registre 9 en hexadecimal: %x\n",miniriscTest->regs[9]);
+
+    // ----------------------------------------------------------------------------------
+
+    // Test de MUL
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/mul_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour MUL ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+    printf("Valeur dans le registre 5 en hexadecimal: %x\n",miniriscTest->regs[5]);
+
+    // Test de MULH
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/mulh_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour MULH ===\n");
+    printf("Valeur dans le registre 2 en hexadecimal: %x\n",miniriscTest->regs[2]);
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+    printf("Valeur dans le registre 7 en hexadecimal: %x\n",miniriscTest->regs[7]);
+
+    // Test de MULHSU
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/mulhsu_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour MULHSU ===\n");
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+
+    // Test de MULHU
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/mulhu_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour MULHU ===\n");
+    printf("Valeur dans le registre 2 en hexadecimal: %x\n",miniriscTest->regs[2]);
+    printf("Valeur dans le registre 3 en hexadecimal: %x\n",miniriscTest->regs[3]);
+
+    // Test de DIV TODO Verifier si l'erreur est normale. Surement que non.
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/div_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour DIV ===\n");
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+    printf("Valeur dans le registre 5 en hexadecimal: %x\n",miniriscTest->regs[5]);
+    printf("Valeur dans le registre 8 en hexadecimal: %x\n",miniriscTest->regs[8]);
+
+    // Test de DIVU
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/divu_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour DIVU ===\n");
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+    printf("Valeur dans le registre 5 en hexadecimal: %x\n",miniriscTest->regs[5]);
+    printf("Valeur dans le registre 6 en hexadecimal: %x\n",miniriscTest->regs[6]);
+
+    // Test de REM
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/rem_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour REM ===\n");
+    printf("Valeur dans le registre 5 en hexadecimal: %x\n",miniriscTest->regs[5]);
+    printf("Valeur dans le registre 6 en hexadecimal: %x\n",miniriscTest->regs[6]);
+    printf("Valeur dans le registre 7 en hexadecimal: %x\n",miniriscTest->regs[7]);
+
+    // Test de REMU
+    miniriscTest->halt = 0;
+    miniriscTest->PC = 0x80000000;
+    platform_load_program(platformTest, "/home/wizhack/Document/ensta/architectureordinateurs/embedded_software/remu_test/build/esw.bin");
+    minirisc_run(miniriscTest);
+    printf("=== Test pour REMU ===\n");
+    printf("Valeur dans le registre 4 en hexadecimal: %x\n",miniriscTest->regs[4]);
+    printf("Valeur dans le registre 5 en hexadecimal: %x\n",miniriscTest->regs[5]);
 
     minirisc_free(miniriscTest);
     platform_free(platformTest);
